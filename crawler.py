@@ -58,6 +58,11 @@ class Crawler:
         self._write_log(self.file_list, local_indent=1)
         self._write_log(["Names collected."])
 
+    def get_target_files(self, target):
+        self.set_target_names(target)
+        self.collect_names()
+        return self.file_list
+
     def run(self, mode='all'):
         self.mode_dict[mode]()
 
