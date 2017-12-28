@@ -31,7 +31,7 @@ class Logger:
     def write_section_break(self):
         self.write([80*'#', 80*' '])
 
-    def write(self, messages, verbose=False, local_indent=0):
+    def write(self, messages, verbose=None, local_indent=0):
         # Write a message to the log file
         msg_indent = (self.global_indent + local_indent) * self.indent_str
 
@@ -45,7 +45,7 @@ class Logger:
                 with open(self.log_filepath, 'a') as lf:
                     lf.write(message + '\n')
 
-            if self.verbose or verbose:
+            if (verbose is None and self.verbose) or verbose:
                 print(message)
 
     def write_blankline(self, verbose=False):

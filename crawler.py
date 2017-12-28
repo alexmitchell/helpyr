@@ -44,7 +44,7 @@ class Crawler:
         self._write_log(target_names, local_indent=1)
 
 
-    def collect_names(self):
+    def collect_names(self, verbose_file_list=True):
         self.file_list = []
 
         self._write_log(["Collecting file names..."])
@@ -55,12 +55,12 @@ class Crawler:
                     if fnmatch.fnmatch(filename, target):
                         filepath = os.path.join(dirpath, filename)
                         self.file_list.append(filepath)
-        self._write_log(self.file_list, local_indent=1)
+        self._write_log(self.file_list, local_indent=1, verbose=verbose_file_list)
         self._write_log(["Names collected."])
 
-    def get_target_files(self, target):
+    def get_target_files(self, target, verbose_file_list=True):
         self.set_target_names(target)
-        self.collect_names()
+        self.collect_names(verbose_file_list=verbose_file_list)
         return self.file_list
 
     def run(self, mode='all'):
