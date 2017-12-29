@@ -20,12 +20,14 @@ class DataLoader:
 
         if destination_dir is not None:
             self.destination_dir = destination_dir
-            self.destination_path = os.path.join(destination_dir, '{}.pkl')
             ensure_dir_exists(self.destination_dir, self.logger)
             self.logger.write([f"Pickle dir is {self.destination_dir}"])
 
 
-    def is_pickled(self, *names):
+    def format_picklepath(self, name, dir):
+        return os.path.join(dir, f"{name}.pkl")
+
+    def is_pickled(self, *names, add_path=True, use_destination=True):
         # Check to see if there is a pickled-data file
 
         # force names to be a list
@@ -34,24 +36,28 @@ class DataLoader:
         msg = f"Checking if pickle{plural[0]} {names} exist{plural[1]}..."
         printer(msg, logger=self.logger)
 
-        path = self.destination_path
+        dir = self.destination_dir if use_destination else self.source_dir
+        format_pkl = lambda name: self.format_picklepath(name, dir) if add_path else name
         isfile = os.path.isfile
-        return all([isfile(path.format(name)) for name in names])
+        return all([isfile(format_pkl(name)) for name in names])
 
-    def load_pickle(self, name, add_path=True):
+    def load_pickle(self, name, add_path=True, use_source=True):
         # Load pickle data
-        pkl_path = self.destination_path.format(name) if add_path else name
+        # use_source allows you to pick if the target pickle is in the 
+        # source_dir or destination_dir. 
+        dir = self.source_dir if use_source else self.destination_dir
+        pkl_path = self.format_picklepath(name, dir) if add_path else name
         try:
             return pd.read_pickle(pkl_path)
-        else AttributeError:
+        except AttributeError:
             with open(pkl_path, mode='rb') as pkl_file:
                 return pickle.load(pkl_file)
 
-    def load_pickles(self, names, add_path=True):
+    def load_pickles(self, names, add_path=True, use_source=True):
         # Load pickle data store in dict
         output = {}
         for name in names:
-            output[name] = self.load_pickle(name, add_path)
+            output[name] = self.load_pickle(name, add_path, use_source)
         return output
 
     def _get_filepath(self, name, is_path=False):
@@ -91,8 +97,10 @@ class DataLoader:
         # Returns a list of all the filepaths for the pickles produced
         printer("Performing pickling process...", logger=self.logger)
         destination_paths = []
+        dest_dir = self.destination_dir
+        target_dir = dest_dir if dest_dir is not None else self.source_dir
         for name in prepickles:
-            pkl_path = self.destination_path.format(name)
+            pkl_path = self.format_picklepath(name, target_dir)
             printer(f"Making pickle {name} at {pkl_path}",logger=self.logger)
             try:
                 prepickles[name].to_pickle(pkl_path)
