@@ -33,12 +33,15 @@ class Logger:
 
     def write(self, messages, verbose=None, local_indent=0):
         # Write a message to the log file
-        msg_indent = (self.global_indent + local_indent) * self.indent_str
+        if messages is None:
+            # don't print anything if message is None
+            return
 
         if isinstance(messages, str):
             # Turn messages into a list of strings
             messages = [messages]
 
+        msg_indent = (self.global_indent + local_indent) * self.indent_str
         for message in messages:
             message = msg_indent + message
             if not self.no_log:
@@ -48,7 +51,21 @@ class Logger:
             if (verbose is None and self.verbose) or verbose:
                 print(message)
 
-    def write_blankline(self, verbose=False):
-        self.write([''], verbose=verbose)
+    def write_blankline(self, n=1, verbose=False):
+        self.write(['']*n, verbose=verbose)
 
+    def run_indented_function(self, function, before_msg=None, after_msg=None):
+        # Runs the provided function with automatically indented internal log 
+        # messages.
+        # Function takes no args and cannot return anything
+        self.write(before_msg)
+        self.increase_global_indent()
+        function()
+        self.decrease_global_indent()
+        self.write(after_msg)
+        self.write_blankline()
 
+    def warning(self, messages):
+        warning_msg = "Warning: "
+        self.write(warning_msg + messages[0] + ":")
+        self.write(messages[1:], local_indent=1)

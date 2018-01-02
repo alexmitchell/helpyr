@@ -15,13 +15,13 @@ class DataLoader:
         self.source_dir = source_dir
         self.logger = logger
         self.logger.write(["DataLoader created",
-                          f"Data dir is {self.source_dir}",
+                          f"Source dir is {self.source_dir}",
                           ])
 
         if destination_dir is not None:
             self.destination_dir = destination_dir
             ensure_dir_exists(self.destination_dir, self.logger)
-            self.logger.write([f"Pickle dir is {self.destination_dir}"])
+            self.logger.write([f"Destination dir is {self.destination_dir}"])
 
 
     def format_picklepath(self, name, dir):
@@ -54,7 +54,8 @@ class DataLoader:
                 return pickle.load(pkl_file)
 
     def load_pickles(self, names, add_path=True, use_source=True):
-        # Load pickle data store in dict
+        # Load pickle data from list of names and return in dict
+        # dict is {name: data}
         output = {}
         for name in names:
             output[name] = self.load_pickle(name, add_path, use_source)

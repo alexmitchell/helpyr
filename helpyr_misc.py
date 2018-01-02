@@ -2,10 +2,12 @@
 
 import os
 
-def nsplit(path, n):
+def nsplit(path, n, fsplit=os.path.split, fargs=None):
     # Recursively splits 'path' 'n' times. Could *not* find a way to condense 
-    # into a one liner.... :/
-    head, tail = os.path.split(path)
+    # into a one liner.... :/ (updated since then so a one liner would be 
+    # impractical)
+    # fsplit allows user to choose splitting function and provide args in fargs
+    head, tail = fsplit(path, *fargs) if fargs is not None else fsplit(path)
     return  nsplit(head, n-1) + [tail] if n and tail else [path]
 
 def ensure_dir_exists(dir_path, logger=None):
