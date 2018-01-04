@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os.path
+from pandas import option_context as pd_option_context
 
 from helpyr_misc import ensure_dir_exists
 
@@ -53,6 +54,24 @@ class Logger:
 
     def write_blankline(self, n=1, verbose=False):
         self.write(['']*n, verbose=verbose)
+
+    def write_dataframe(self, dataframe, name='', float_formatter=None):
+        df_str = ""
+        #if context_args is None:
+        #    context_args = ['display.max_rows', 10000,
+        #                    'display.max_columns', 10000,
+        #                    'display.expand_frame_repr', False,
+        #                    'display.precision', 3,
+        #                    ]
+        #with pd_option_context(*context_args):
+        #    df_str = dataframe.__repr__()
+        def fformatter(val):
+            return "{:13.3f}".format(val)
+        formatter = fformatter if float_formatter is None else float_formatter
+        df_str = dataframe.to_string(float_format=formatter)
+        if name:
+            self.write(name)
+        self.write(df_str.split('\n'), local_indent=1)
 
     def run_indented_function(self, function, before_msg=None, after_msg=None):
         # Runs the provided function with automatically indented internal log 
