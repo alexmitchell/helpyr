@@ -27,19 +27,27 @@ class DataLoader:
     def format_picklepath(self, name, dir):
         return os.path.join(dir, f"{name}.pkl")
 
-    def is_pickled(self, *names, add_path=True, use_destination=True):
-        # Check to see if there is a pickled-data file
+    def is_pickled(self, names, add_path=True, use_destination=True):
+        # Check to see if there is a pickled-data file for the provided name(s)
 
         # force names to be a list
-        names = [names] if isinstance(names, str) else names
-        plural = ["s", ""] if len(names) > 1 else ["","s"]
-        msg = f"Checking if pickle{plural[0]} {names} exist{plural[1]}..."
+        lnames = [names] if isinstance(names, str) else names
+        plural = len(lnames) > 1
+        p1 = 's' if plural else ''
+        p2 = ''  if plural else 's'
+        p3 = ''  if plural else 'es'
+        msg = f"Checking if pickle{p1} {names} exist{p2}..."
         printer(msg, logger=self.logger)
 
         dir = self.destination_dir if use_destination else self.source_dir
         format_pkl = lambda name: self.format_picklepath(name, dir) if add_path else name
         isfile = os.path.isfile
-        return all([isfile(format_pkl(name)) for name in names])
+
+        exists = all([isfile(format_pkl(name)) for name in lnames])
+        e1 = '' if exists else 'not'
+        msg = f"Pickle{p1} do{p3} {e1} exist"
+        printer(msg, logger=self.logger)
+        return exists
 
     def load_pickle(self, name, add_path=True, use_source=True):
         # Load pickle data
@@ -94,7 +102,8 @@ class DataLoader:
 
     def produce_pickles(self, prepickles):
         # Pickle things so I don't have to keep rereading the original files
-        # prepickles is a dictionary of {'filename':data}
+        # prepickles is a dictionary of {'pickle_name':data}
+        # pickle_name will be used to create the filename
         # Returns a list of all the filepaths for the pickles produced
         printer("Performing pickling process...", logger=self.logger)
         destination_paths = []
