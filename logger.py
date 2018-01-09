@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 
+from time import asctime
 import os.path
 from pandas import option_context as pd_option_context
 
 from helpyr_misc import ensure_dir_exists
+
+# To do:
+# Create an archive file that accumulates all runs and change main file to be 
+# overwritten every run.
 
 class Logger:
 
@@ -12,6 +17,7 @@ class Logger:
         self.global_indent = 0
         self.indent_str = 4*' '
         self.no_log = no_log or log_filepath is None or "" == log_filepath
+        self.start_time = asctime()
 
         if self.no_log:
             print("Logger is set to not log")
@@ -19,6 +25,18 @@ class Logger:
         else:
             self.log_filepath = log_filepath
             ensure_dir_exists(os.path.split(log_filepath)[0], logger=self)
+
+        self.write_section_break()
+        self.write_section_break()
+        self.write(f"Begin Logger run output at {self.start_time}")
+
+    def begin_output(self, name):
+        self.write_section_break()
+        self.write([f"Begin {name} output", asctime()])
+
+    def end_output(self):
+        self.write([f"Search for '{self.start_time}' to find beginning of run"])
+        self.write_section_break()
 
 
     def increase_global_indent(self):
@@ -85,6 +103,8 @@ class Logger:
         self.write_blankline()
 
     def warning(self, messages):
+        # Display warning messages. The first message will be the warning 
+        # title.
         warning_msg = "Warning: "
         self.write(warning_msg + messages[0] + ":")
         self.write(messages[1:], local_indent=1)

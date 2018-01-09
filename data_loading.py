@@ -27,6 +27,9 @@ class DataLoader:
     def format_picklepath(self, name, dir):
         return os.path.join(dir, f"{name}.pkl")
 
+    def _get_filepath(self, name, is_path=False):
+        return name if is_path else os.path.join(self.source_dir, name)
+
     def is_pickled(self, names, add_path=True, use_destination=True):
         # Check to see if there is a pickled-data file for the provided name(s)
 
@@ -49,6 +52,7 @@ class DataLoader:
         printer(msg, logger=self.logger)
         return exists
 
+
     def load_pickle(self, name, add_path=True, use_source=True):
         # Load pickle data
         # use_source allows you to pick if the target pickle is in the 
@@ -68,9 +72,6 @@ class DataLoader:
         for name in names:
             output[name] = self.load_pickle(name, add_path, use_source)
         return output
-
-    def _get_filepath(self, name, is_path=False):
-        return name if is_path else os.path.join(self.source_dir, name)
 
     def load_xlsx(self, filename, pd_kwargs, is_path=False):
         filepath = self._get_filepath(filename, is_path)
@@ -100,7 +101,8 @@ class DataLoader:
         else:
             return data
 
-    def produce_pickles(self, prepickles):
+
+    def produce_pickles(self, prepickles, add_path=True):
         # Pickle things so I don't have to keep rereading the original files
         # prepickles is a dictionary of {'pickle_name':data}
         # pickle_name will be used to create the filename
@@ -110,7 +112,7 @@ class DataLoader:
         dest_dir = self.destination_dir
         target_dir = dest_dir if dest_dir is not None else self.source_dir
         for name in prepickles:
-            pkl_path = self.format_picklepath(name, target_dir)
+            pkl_path = self.format_picklepath(name, target_dir) if add_path else name
             printer(f"Making pickle {name} at {pkl_path}",logger=self.logger)
             try:
                 prepickles[name].to_pickle(pkl_path)
@@ -123,3 +125,24 @@ class DataLoader:
 
         return destination_paths
 
+    def save_txt(self, data, filename, kwargs={}, is_path=False):
+    #def load_txt(self, filename, skiprows, skipfooter, flip=False, delimiter='\s*'):
+        filepath = self._get_filepath(filename, is_path)
+        if is_path:
+            ensure_dir_exists(os.path.split(filepath)[0])
+
+        # Some default parameters
+        keys = kwargs.keys()
+        if 'sep' not in keys:
+            kwargs['sep'] = '\t'
+        if 'na_rep' not in keys:
+            kwargs['na_rep'] = 'NaN'
+        if 'float_format' not in keys:
+            kwargs['float_format'] = "%8.3f"
+        if 'index' not in keys:
+            kwargs['index'] = False
+        if 'header' not in keys:
+            kwargs['header'] = True
+
+        with open(filepath, mode='tw') as txt_file:
+            data.to_csv(txt_file, **kwargs)

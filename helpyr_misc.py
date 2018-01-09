@@ -2,6 +2,12 @@
 
 import os
 
+def print_entire_df(df):
+    from pandas import option_context
+    # Print all rows in a dataframe
+    with option_context('display.max_rows', None):
+        print(df)
+
 def nsplit(path, n, fsplit=os.path.split, fargs=None):
     # Recursively splits 'path' 'n' times. Could *not* find a way to condense 
     # into a one liner.... :/ (updated since then so a one liner would be 

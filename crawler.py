@@ -13,7 +13,6 @@ class Crawler:
     def __init__(self, logger=None):
         self.logger = logger# if logger is not None\
                 #else logger_module.Logger(log_filepath="/dev/null")
-        self._write_log_section_break()
         self._write_log(["Begin crawler output", asctime()])
 
         self.set_root("./")
@@ -33,12 +32,19 @@ class Crawler:
         if self.logger is not None:
             self.logger.write(messages, **kwargs)
 
+    def _write_log_search_marker(self):
+        if self.logger is not None:
+            self.logger.end_output()
+
 
     def set_root(self, root_dir):
         self.root = root_dir
         self._write_log(["Root dir set to " + root_dir])
 
     def set_target_names(self, target_names):
+        # * or ? for wildcards
+        if isinstance(target_names, str):
+            target_names = [target_names]
         self.target_names = target_names
         self._write_log(["Target names set to:"])
         self._write_log(target_names, local_indent=1)
@@ -59,6 +65,7 @@ class Crawler:
         self._write_log(["Names collected."])
 
     def get_target_files(self, target, verbose_file_list=True):
+        # * or ? for wildcards
         self.set_target_names(target)
         self.collect_names(verbose_file_list=verbose_file_list)
         return self.file_list
