@@ -80,7 +80,6 @@ class DataLoader:
         return data
 
     def load_txt(self, filename, kwargs, flip=False, is_path=False):
-    #def load_txt(self, filename, skiprows, skipfooter, flip=False, delimiter='\s*'):
         filepath = self._get_filepath(filename, is_path)
 
         # Some default parameters
@@ -126,7 +125,6 @@ class DataLoader:
         return destination_paths
 
     def save_txt(self, data, filename, kwargs={}, is_path=False):
-    #def load_txt(self, filename, skiprows, skipfooter, flip=False, delimiter='\s*'):
         filepath = self._get_filepath(filename, is_path)
         if is_path:
             ensure_dir_exists(os.path.split(filepath)[0])
