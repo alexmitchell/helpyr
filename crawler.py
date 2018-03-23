@@ -51,6 +51,9 @@ class Crawler:
 
 
     def collect_names(self, verbose_file_list=True):
+        # Collect the target names. Stores the list internally, does not return 
+        # a value. verbose_file_list controls whether the files found should be 
+        # printed out to the log file. 
         self.file_list = []
 
         self._write_log(["Collecting file names..."])
@@ -65,6 +68,8 @@ class Crawler:
         self._write_log(["Names collected."])
 
     def get_target_files(self, target, verbose_file_list=True):
+        # returns the list of collected names. meant to simplify the use of the 
+        # crawler when it plays a smaller role in your code.
         # * or ? for wildcards
         self.set_target_names(target)
         self.collect_names(verbose_file_list=verbose_file_list)
