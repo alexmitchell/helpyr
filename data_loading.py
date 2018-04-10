@@ -18,8 +18,8 @@ class DataLoader:
                           f"Source dir is {self.source_dir}",
                           ])
 
+        self.destination_dir = destination_dir
         if destination_dir is not None:
-            self.destination_dir = destination_dir
             ensure_dir_exists(self.destination_dir, self.logger)
             self.logger.write([f"Destination dir is {self.destination_dir}"])
 
@@ -27,8 +27,8 @@ class DataLoader:
     def format_picklepath(self, name, dir):
         return os.path.join(dir, f"{name}.pkl")
 
-    def _get_filepath(self, name, is_path=False):
-        return name if is_path else os.path.join(self.source_dir, name)
+    def _get_filepath(self, name, add_path=True):
+        return os.path.join(self.source_dir, name) if add_path else name
 
     def is_pickled(self, names, add_path=True, use_destination=True):
         # Check to see if there is a pickled-data file for the provided name(s)
@@ -47,8 +47,8 @@ class DataLoader:
         isfile = os.path.isfile
 
         exists = all([isfile(format_pkl(name)) for name in lnames])
-        e1 = '' if exists else 'not'
-        msg = f"Pickle{p1} do{p3} {e1} exist"
+        e1 = '' if exists else 'not '
+        msg = f"Pickle{p1} do{p3} {e1}exist"
         printer(msg, logger=self.logger)
         return exists
 
@@ -79,8 +79,13 @@ class DataLoader:
         data = pd.read_excel(filepath, **pd_kwargs)
         return data
 
-    def load_txt(self, filename, kwargs, flip=False, is_path=False):
-        filepath = self._get_filepath(filename, is_path)
+    def load_txt(self, filename, kwargs, flip=False, add_path=True):
+        # filename is can be the filename or filepath of a txt file
+        # kwargs are passed into the panda read_csv function
+        # flip is whether to vertically flip the data
+        # add_path indicates whether to add a root path (if filename is just a
+        #  name) or not add a root path (if filename is already a filepath)
+        filepath = self._get_filepath(filename, add_path)
 
         # Some default parameters
         keys = kwargs.keys()
@@ -93,7 +98,11 @@ class DataLoader:
         if 'delimiter' not in keys:
             kwargs['delimiter'] = r'\s+' # any whitespace
 
-        data = pd.read_csv(filepath, **kwargs)
+        try:
+            data = pd.read_csv(filepath, **kwargs)
+        except:
+            print(filename)
+            raise
 
         if flip:
             return data.iloc[::-1]
@@ -101,18 +110,20 @@ class DataLoader:
             return data
 
 
-    def produce_pickles(self, prepickles, add_path=True):
+    def produce_pickles(self, prepickles, add_path=True, verbose=True):
         # Pickle things so I don't have to keep rereading the original files
         # prepickles is a dictionary of {'pickle_name':data}
         # pickle_name will be used to create the filename
         # Returns a list of all the filepaths for the pickles produced
-        printer("Performing pickling process...", logger=self.logger)
+        #if verbose: printer("Performing pickling process...", logger=self.logger)
         destination_paths = []
         dest_dir = self.destination_dir
         target_dir = dest_dir if dest_dir is not None else self.source_dir
         for name in prepickles:
             pkl_path = self.format_picklepath(name, target_dir) if add_path else name
-            printer(f"Making pickle {name} at {pkl_path}",logger=self.logger)
+            pkl_filename = name if add_path else os.path.split(name)[1]
+            if verbose:
+                printer(f"Pickling {pkl_filename} at {pkl_path}", logger=self.logger)
             try:
                 prepickles[name].to_pickle(pkl_path)
             except AttributeError:
@@ -120,7 +131,7 @@ class DataLoader:
                     pickle.dump(prepickles[name], pkl_file)
             destination_paths.append(pkl_path)
 
-        printer("Pickles produced!", logger=self.logger)
+        #if verbose: printer("Pickles produced!", logger=self.logger)
 
         return destination_paths
 

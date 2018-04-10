@@ -91,16 +91,21 @@ class Logger:
             self.write(name)
         self.write(df_str.split('\n'), local_indent=1)
 
-    def run_indented_function(self, function, before_msg=None, after_msg=None):
+    def run_indented_function(self, function, kwargs=None, before_msg=None, after_msg=None):
         # Runs the provided function with automatically indented internal log 
         # messages.
-        # Function takes no args and cannot return anything
+        # Function takes only keyworded args
         self.write(before_msg)
         self.increase_global_indent()
-        function()
+        if kwargs is not None:
+            out = function(**kwargs)
+        else:
+            out = function()
         self.decrease_global_indent()
         self.write(after_msg)
         self.write_blankline()
+
+        return out
 
     def warning(self, messages):
         # Display warning messages. The first message will be the warning 

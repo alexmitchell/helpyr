@@ -64,8 +64,9 @@ class Crawler:
                     if fnmatch.fnmatch(filename, target):
                         filepath = os.path.join(dirpath, filename)
                         self.file_list.append(filepath)
+        n_files = len(self.file_list)
         self._write_log(self.file_list, local_indent=1, verbose=verbose_file_list)
-        self._write_log(["Names collected."])
+        self._write_log([f"Names collected. {n_files} files found"])
 
     def get_target_files(self, target, verbose_file_list=True):
         # returns the list of collected names. meant to simplify the use of the 
