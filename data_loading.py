@@ -73,8 +73,8 @@ class DataLoader:
             output[name] = self.load_pickle(name, add_path, use_source)
         return output
 
-    def load_xlsx(self, filename, pd_kwargs, is_path=False):
-        filepath = self._get_filepath(filename, is_path)
+    def load_xlsx(self, filename, pd_kwargs, add_path=True):
+        filepath = self._get_filepath(filename, add_path)
 
         data = pd.read_excel(filepath, **pd_kwargs)
         return data

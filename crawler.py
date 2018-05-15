@@ -15,8 +15,8 @@ class Crawler:
                 #else logger_module.Logger(log_filepath="/dev/null")
         self._write_log(["Begin crawler output", asctime()])
 
-        self.set_root("./")
-        self.set_target_names(["*\.*"]) # default to all files
+        self.set_root("./", verbose=False)
+        self.set_target_names(["*\.*"], verbose=False) # default to all files
         self.file_list = []
         self.mode_dict = {'all': self.run_all}
 
@@ -37,17 +37,17 @@ class Crawler:
             self.logger.end_output()
 
 
-    def set_root(self, root_dir):
+    def set_root(self, root_dir, verbose=True):
         self.root = root_dir
-        self._write_log(["Root dir set to " + root_dir])
+        self._write_log(["Root dir set to " + root_dir], verbose=verbose)
 
-    def set_target_names(self, target_names):
+    def set_target_names(self, target_names, verbose=True):
         # * or ? for wildcards
         if isinstance(target_names, str):
             target_names = [target_names]
         self.target_names = target_names
-        self._write_log(["Target names set to:"])
-        self._write_log(target_names, local_indent=1)
+        self._write_log(["Target names set to:"], verbose=verbose)
+        self._write_log(target_names, local_indent=1, verbose=verbose)
 
 
     def collect_names(self, verbose_file_list=True):
