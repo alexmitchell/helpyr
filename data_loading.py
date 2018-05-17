@@ -57,6 +57,10 @@ class DataLoader:
         # Load pickle data
         # use_source allows you to pick if the target pickle is in the 
         # source_dir or destination_dir. 
+        if isinstance(name, list):
+            # was given a list of names, pass it to the plural function
+            return self.load_pickles(name, add_path=add_path, use_source=use_source)
+
         dir = self.source_dir if use_source else self.destination_dir
         pkl_path = self.format_picklepath(name, dir) if add_path else name
         try:
@@ -110,7 +114,7 @@ class DataLoader:
             return data
 
 
-    def produce_pickles(self, prepickles, add_path=True, verbose=True):
+    def produce_pickles(self, prepickles, add_path=True, verbose=True, overwrite=False):
         # Pickle things so I don't have to keep rereading the original files
         # prepickles is a dictionary of {'pickle_name':data}
         # pickle_name will be used to create the filename
@@ -122,8 +126,16 @@ class DataLoader:
         for name in prepickles:
             pkl_path = self.format_picklepath(name, target_dir) if add_path else name
             pkl_filename = name if add_path else os.path.split(name)[1]
+
+            if not overwrite and os.path.isfile(pkl_path):
+                if verbose:
+                    printer(f"Pickle already exists (skipping): {pkl_path}", logger=self.logger)
+                continue
             if verbose:
-                printer(f"Pickling {pkl_filename} at {pkl_path}", logger=self.logger)
+                if overwrite and os.path.isfile(pkl_path):
+                    printer(f"Overwriting {pkl_filename} at {pkl_path}", logger=self.logger)
+                else:
+                    printer(f"Pickling {pkl_filename} at {pkl_path}", logger=self.logger)
             try:
                 prepickles[name].to_pickle(pkl_path)
             except AttributeError:

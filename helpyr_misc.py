@@ -47,7 +47,7 @@ def isnumeric(obj):
     except ValueError:
         return False
 
-def exclude_df_cols(self, dataframe, exclude):
+def exclude_df_cols(dataframe, exclude):
     # Return a list of target columns from a dataframe with some excluded.
     # Assumes a panda dataframe
     # exclude should be a list of column labels
