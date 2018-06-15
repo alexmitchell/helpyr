@@ -2,6 +2,7 @@
 
 
 import pandas as pd
+from numpy import loadtxt as np_loadtxt
 import os
 import pickle
 
@@ -110,6 +111,25 @@ class DataLoader:
 
         if flip:
             return data.iloc[::-1]
+        else:
+            return data
+
+    def load_txt_np(self, filename, kwargs={}, flip=False, add_path=True):
+        # filename is can be the filename or filepath of a txt file
+        # kwargs are passed into the panda read_csv function
+        # flip is whether to vertically flip the data
+        # add_path indicates whether to add a root path (if filename is just a
+        #  name) or not add a root path (if filename is already a filepath)
+        filepath = self._get_filepath(filename, add_path)
+
+        try:
+            data = np_loadtxt(filepath, **kwargs)
+        except:
+            print(filename)
+            raise
+
+        if flip:
+            return data[::-1]
         else:
             return data
 
