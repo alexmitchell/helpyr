@@ -12,7 +12,7 @@ from helpyr_misc import ensure_dir_exists
 
 class Logger:
 
-    def __init__(self, log_filepath="./log-crawler.txt", default_verbose=False, no_log=False):
+    def __init__(self, log_filepath="./log-crawler.txt", default_verbose=True, no_log=False):
         self.verbose = default_verbose
         self.global_indent = 0
         self.indent_str = 4*' '
@@ -70,7 +70,7 @@ class Logger:
             if (verbose is None and self.verbose) or verbose:
                 print(message)
 
-    def write_blankline(self, n=1, verbose=False):
+    def write_blankline(self, n=1, verbose=None):
         self.write(['']*n, verbose=verbose)
 
     def write_dataframe(self, dataframe, name='', float_formatter=None):

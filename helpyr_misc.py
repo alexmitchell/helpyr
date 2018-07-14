@@ -9,9 +9,9 @@ def print_entire_df(df):
         print(df)
 
 def nsplit(path, n, fsplit=os.path.split, fargs=None):
-    # Recursively splits 'path' 'n' times. Could *not* find a way to condense 
-    # into a one liner.... :/ (updated since then so a one liner would be 
-    # impractical)
+    # Recursively splits 'path' 'n' times. Returns a n+1 length list. Could 
+    # *not* find a way to condense into a one liner.... :/ (updated since then 
+    # so a one liner would be impractical)
     # fsplit allows user to choose splitting function and provide args in fargs
     head, tail = fsplit(path, *fargs) if fargs is not None else fsplit(path)
     return  nsplit(head, n-1) + [tail] if n and tail else [path]
