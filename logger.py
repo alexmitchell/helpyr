@@ -70,6 +70,10 @@ class Logger:
             if (verbose is None and self.verbose) or verbose:
                 print(message)
 
+    def write_greeting(self, message):
+        # writes greeting message plus a timestamp
+        self.write([message, asctime()])
+
     def write_blankline(self, n=1, verbose=None):
         self.write(['']*n, verbose=verbose)
 

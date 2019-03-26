@@ -53,3 +53,9 @@ def exclude_df_cols(dataframe, exclude):
     # exclude should be a list of column labels
     return [col for col in dataframe.columns.values if col not in exclude]
 
+def get_kwarg(kwargs, variable_str, default=None):
+    # Allows cleaning parsing of kwargs
+    # return the kwarg argument if it exists, otherwise, return the default
+    # variable_str is the kwarg key 
+    return kwargs[variable_str] if variable_str in kwargs else default
+

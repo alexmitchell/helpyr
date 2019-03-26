@@ -14,7 +14,7 @@ class DataLoader:
 
     def __init__(self, source_dir, destination_dir=None, logger=None):
         self.source_dir = source_dir
-        self.logger = logger
+        self.logger =  logger_module.Logger(None)if logger is None else logger
         self.logger.write(["DataLoader created",
                           f"Source dir is {self.source_dir}",
                           ])
@@ -26,7 +26,8 @@ class DataLoader:
 
 
     def format_picklepath(self, name, dir):
-        return os.path.join(dir, f"{name}.pkl")
+        pkl_name = f"{name}{'' if name[-4:] == '.pkl' else '.pkl'}"
+        return os.path.join(dir, pkl_name)
 
     def _get_filepath(self, name, add_path=True):
         return os.path.join(self.source_dir, name) if add_path else name
