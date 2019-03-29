@@ -4,7 +4,7 @@ from time import asctime
 import os.path
 from pandas import option_context as pd_option_context
 
-from helpyr_misc import ensure_dir_exists
+from helpyr.helpyr_misc import ensure_dir_exists
 
 # To do:
 # Create an archive file that accumulates all runs and change main file to be 

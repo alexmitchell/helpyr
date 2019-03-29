@@ -6,9 +6,9 @@ from numpy import loadtxt as np_loadtxt
 import os
 import pickle
 
-import logger as logger_module
-from helpyr_misc import printer
-from helpyr_misc import ensure_dir_exists
+import helpyr.logger as logger_module
+from helpyr.helpyr_misc import printer
+from helpyr.helpyr_misc import ensure_dir_exists
 
 class DataLoader:
 
