@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 
-def check_kwarg(kwargs, name, default=None):
+def check_kwarg(kwargs, name, default=None, required=False):
     """ Simple function for checking a kwarg. Useful if you don't want to
     create a new object to check a kwarg or two. """
+    if required:
+        assert name in kwargs
     return kwargs[name] if name in kwargs else default
 
-def get_check_kwarg_fu(kwargs):
+def get_check_kwarg_fu(function_kwargs):
     """ Create a simple function for checking kwargs. Useful if you don't 
     need long term storage of KwargChecker and find supplying kwargs to 
     check_kwarg as an argument annoying. """
-
-    fu = lambda name, default: \
-        kwargs[name] if name in kwargs else default
+    def fu(name, default=None, required=False):
+        return check_kwarg(function_kwargs, name,
+                default=default, required=required)
     return fu
 
 
