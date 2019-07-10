@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 
-def check_kwarg(kwargs, name, default=None, required=False):
+def check_kwarg(kwargs, name, default=None, required=False, pop=False):
     """ Simple function for checking a kwarg. Useful if you don't want to
-    create a new object to check a kwarg or two. """
+    create a new object to check a kwarg or two. Pop=True will remove the 
+    kwarg entry from kwargs if found. """
     if required:
         assert name in kwargs
-    return kwargs[name] if name in kwargs else default
+    if name in kwargs:
+        return kwargs.pop(name) if pop else kwargs[name]
+    else:
+        return default
 
-def get_check_kwarg_fu(function_kwargs):
+def get_check_kwarg_fu(function_kwargs, pop=False):
     """ Create a simple function for checking kwargs. Useful if you don't 
     need long term storage of KwargChecker and find supplying kwargs to 
-    check_kwarg as an argument annoying. """
+    check_kwarg as an argument annoying. Pop will pop entries out of the 
+    kwargs list if found. """
     def fu(name, default=None, required=False):
         return check_kwarg(function_kwargs, name,
-                default=default, required=required)
+                default=default, required=required, pop=pop)
     return fu
 
 

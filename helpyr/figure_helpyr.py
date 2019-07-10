@@ -45,23 +45,29 @@ class FigureSaver:
         chunks will be joined with '_' to generate the file name. Can't define
         with 'figure_name'.
 
+        'sep' is the separator used to join the figure_name_parts
+
         'figure' is the handle for the figure to save.
 
         'alt_subdir' is the optional alternate subdirectory to use instead of the one
         provided in the constructor.
 
+        Any unused kwargs are passed to plt.savefig or fig.savefig
+
         """
-        check = kwarg_checker.get_check_kwarg_fu(kwargs)
+        kwargs_copy = kwargs.copy()
+        check = kwarg_checker.get_check_kwarg_fu(kwargs_copy, pop=True)
 
         figure_name = check('figure_name', None)
         figure_name_parts = check('figure_name_parts', None)
+        sep = check('sep', '_')
         figure = check('figure', None)
         alt_subdir = check('alt_subdir', None)
 
         assert((figure_name is None) ^ (figure_name_parts is None)) # XOR
 
         if figure_name is None:
-            figure_name = '_'.join(figure_name_parts)
+            figure_name = sep.join(figure_name_parts)
 
         # Check if an alternate subdirectory is desired
         if alt_subdir is None:
@@ -89,10 +95,10 @@ class FigureSaver:
 
             if figure is not None:
                 # Save target figure
-                figure.savefig(filepath, orientation='landscape')
+                figure.savefig(filepath, orientation='landscape', **kwargs_copy)
             else:
                 # Save current figure
-                plt.savefig(filepath, orientation='landscape')
+                plt.savefig(filepath, orientation='landscape', **kwargs_copy)
 
 
 
@@ -193,7 +199,6 @@ class StableSubplots:
         if saving_fu is None:
             saver = FigureSaver(logger=self.logger)
             saving_fu = saver.save_figure
-
 
         # Save the target figures
         for name in target_figs:
