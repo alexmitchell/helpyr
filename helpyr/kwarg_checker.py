@@ -23,16 +23,18 @@ def get_check_kwarg_fu(function_kwargs, pop=False):
 
 
 
-def check_add_kwarg(kwargs, name, default, force=False):
+def check_add_kwarg(kwargs, name, default=None, force=False):
     """ Simple function for checking if a name is in kwargs and adding a 
     default value if it isn't. If force is True, it will overwrite an
-    existing value with default. """
+    existing value with default. It will return the existing or default value.
+    """
     if name not in kwargs or force:
         kwargs[name] = default
+    return kwargs[name]
 
 def get_check_add_kwarg_fu(function_kwargs):
     """ Create a simple function for checking and adding kwargs. """
-    def fu(name, default, force=False):
+    def fu(name, default=None, force=False):
         return check_add_kwarg(function_kwargs, name, default, force=force)
     return fu
 

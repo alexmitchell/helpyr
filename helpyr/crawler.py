@@ -6,7 +6,7 @@ from time import sleep
 from math import log10
 import sys
 
-import helpyr.logger as logger_module
+import logger as logger_module
 
 # Crawler class traverses a directory tree to find target file types and 
 # perform operations on those files. This is a base class that should be 
