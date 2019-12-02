@@ -6,7 +6,7 @@ from time import sleep
 from math import log10
 import sys
 
-import logger as logger_module
+from helpyr import logger as logger_module
 
 # Crawler class traverses a directory tree to find target file types and 
 # perform operations on those files. This is a base class that should be 
@@ -19,7 +19,7 @@ class Crawler:
                 #else logger_module.Logger(log_filepath="/dev/null")
         self._write_log(["Begin crawler output", asctime()])
 
-        self.set_root("./", verbose=False)
+        self.set_root(os.getcwd(), verbose=False)
         self.set_target_names(["*\.*"], verbose=False) # default to all files
         self.target_dirs = []
         self.file_list = []

@@ -23,8 +23,10 @@ def ensure_dir_exists(dir_path, logger=None):
     # logger is a Logger object (found in Helpyr)
     if not os.path.isdir(dir_path):
         os.makedirs(dir_path, exist_ok=True)
-        if logger is not None:
-            msg = "Making directory at {}.".format(dir_path)
+        msg = "Making directory at {}.".format(dir_path)
+        if logger is None:
+            print(msg)
+        else:
             logger.write([msg])
         return True
     return False

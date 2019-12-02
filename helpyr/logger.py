@@ -60,7 +60,17 @@ class Logger:
             # Turn messages into a list of strings
             messages = [messages]
 
-        msg_indent = (self.global_indent + local_indent) * self.indent_str
+        if isinstance(messages, list):
+            msg_indent = (self.global_indent + local_indent) * self.indent_str
+        else:
+            # If it isn't a list or a string, get the string representation of 
+            # of whatever the object is.
+            #
+            # Don't automatically indent bc its likely a complicated string 
+            # e.g. a pandas dataframe or numpy array
+            messages = [messages.__str__()]
+            msg_indent = ''
+
         for message in messages:
             message = msg_indent + message
             if not self.no_log:

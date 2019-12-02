@@ -66,10 +66,14 @@ class DataLoader:
         dir = self.source_dir if use_source else self.destination_dir
         pkl_path = self.format_picklepath(name, dir) if add_path else name
         try:
-            return pd.read_pickle(pkl_path)
+            data = pd.read_pickle(pkl_path)
+            return data
+
         except AttributeError:
             with open(pkl_path, mode='rb') as pkl_file:
-                return pickle.load(pkl_file)
+                data =  pickle.load(pkl_file)
+            return data
+
 
     def load_pickles(self, names, add_path=True, use_source=True):
         # Load pickle data from list of names and return in dict
@@ -188,3 +192,67 @@ class DataLoader:
 
         with open(filepath, mode='tw') as txt_file:
             data.to_csv(txt_file, **kwargs)
+    def save_xlsx(self, data, filename, key_order=None, save_kwargs={}, add_path=False):
+        # Save a dictionary of pandas objects to an excel sheet. Each entry in 
+        # the dictionary is saved as a separate sheet with the dict key being 
+        # the sheet name. The sheet order can be specified with key_order.
+
+        # Get the path
+        filepath = self._get_filepath(filename, add_path)
+        if not add_path:
+            ensure_dir_exists(os.path.split(filepath)[0])
+
+        # Get the key order. 
+        if isinstance(data, dict):
+            if key_order is None:
+                key_order = list(data.keys()).sort()
+        else:
+            # Assume a single dataframe. Convert into a dict
+            if key_order is None:
+                key = 'Sheet1'
+                key_order = [key]
+            elif not isinstance(key_order, list):
+                key_order = [key_order]
+            data = {key_order[0] : data}
+
+        ## DEBUG
+        #print(f"DEBUGGING xlsx export with a reduced data set")
+        #key_order = key_order[:2]
+
+        self.logger.write(f"Saving data to file {os.path.split(filepath)[-1]}")
+        self.logger.increase_global_indent()
+        min_col_width = 5
+        with pd.ExcelWriter(filepath) as xlsx_file:
+            for sheet_key in key_order:
+                # Write data
+                self.logger.write(f"Writing to sheet {sheet_key}")
+                #self.logger.write(f"DEBUGGING ONLY WRITING DATA HEAD")
+                #data[sheet_key].head().to_excel(xlsx_file, 
+                data[sheet_key].to_excel(xlsx_file, 
+                        sheet_name=sheet_key, 
+                        **save_kwargs)
+
+                # Fix the column widths
+                i_cols = list(data[sheet_key].index.names)
+                d_cols = list(data[sheet_key].columns)
+                cols = i_cols + d_cols
+                #xlsx_cols = [x + y for x in ['', 'A', 'B'] for y in [
+                #    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+                #    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+                #    'Y', 'Z' ]
+                #    ]
+                #xlsx_cols = xlsx_cols[:len(cols)]
+
+                sheet = xlsx_file.sheets[sheet_key]
+                #for c, xc in zip(cols, xlsx_cols):
+                for xc, c in enumerate(cols):
+                    width = len(str(c)) + 0.5
+                    width += 2 if c == 'limb' else 0
+                    width = width if width > min_col_width else min_col_width
+                    #print(f"Fixing col {xc}:{xc} to {width}")
+                    #sheet.set_column(f"{xc}:{xc}", width)
+                    sheet.set_column(xc, xc, width)
+            self.logger.write(f"Wrapping things up...")
+
+        self.logger.decrease_global_indent()
+        self.logger.write(f"Finished saving!")

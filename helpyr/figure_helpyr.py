@@ -41,9 +41,9 @@ class FigureSaver:
         'figure_name' is a complete name for a figure. It will be used directly 
         as the filename. Can't define with 'figure_name_parts'.
 
-        'figure_name_parts' is the ordered sequence of file name chunks. The 
-        chunks will be joined with '_' to generate the file name. Can't define
-        with 'figure_name'.
+        'figure_name_parts' or 'fig_name_parts' is the ordered sequence of file
+        name chunks. The chunks will be joined with '_' to generate the file 
+        name. Can't define with 'figure_name'.
 
         'sep' is the separator used to join the figure_name_parts
 
@@ -60,14 +60,26 @@ class FigureSaver:
 
         figure_name = check('figure_name', None)
         figure_name_parts = check('figure_name_parts', None)
+        fig_name_parts = check('fig_name_parts', None)
         sep = check('sep', '_')
         figure = check('figure', None)
         alt_subdir = check('alt_subdir', None)
 
-        assert((figure_name is None) ^ (figure_name_parts is None)) # XOR
+        try:
+            assert( (figure_name is not None) ^ 
+                    (figure_name_parts is not None) ^
+                    (fig_name_parts is not None) ) # XOR
+        except AssertionError:
+            print(figure_name)
+            print(figure_name_parts)
+            print(fig_name_parts)
+            raise
 
         if figure_name is None:
-            figure_name = sep.join(figure_name_parts)
+            if figure_name_parts is None:
+                figure_name = sep.join(fig_name_parts)
+            else:
+                figure_name = sep.join(figure_name_parts)
 
         # Check if an alternate subdirectory is desired
         if alt_subdir is None:
