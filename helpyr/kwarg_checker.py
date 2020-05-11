@@ -5,7 +5,14 @@ def check_kwarg(kwargs, name, default=None, required=False, pop=False):
     create a new object to check a kwarg or two. Pop=True will remove the 
     kwarg entry from kwargs if found. """
     if required:
-        assert name in kwargs
+        try:
+            assert name in kwargs
+        except AssertionError:
+            print(f"########################################")
+            print(f"## {name} not in kwargs")
+            print(f"## kwargs = {kwargs.keys()}")
+            print(f"########################################")
+            raise
     if name in kwargs:
         return kwargs.pop(name) if pop else kwargs[name]
     else:
