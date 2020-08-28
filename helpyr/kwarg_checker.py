@@ -273,3 +273,14 @@ class KwargChecker:
             return default
 
 
+    def check_add_kwarg(self, name, default=None, arg_type=None, force=False):
+        return check_add_kwarg(self.kwargs, name, 
+                default=default, arg_type=arg_type, force=force)
+
+
+    def check_kwarg(self, name, default=None, arg_type=None, required=False, pop=False):
+        return check_kwarg(self.kwargs, name,
+                default=default, arg_type=arg_type, 
+                required=required, pop=pop)
+
+
